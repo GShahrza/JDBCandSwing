@@ -11,11 +11,12 @@ public class UserSkillDaoImpl implements UserSkillDaoInter {
 
     private UserSkill getUserSkill(ResultSet rs) throws Exception {
         int userId = rs.getInt("id");
+        int userSkillId = rs.getInt("userSkillId");
         int skillId = rs.getInt("skill_id");
         String skillName = rs.getString("skill_name");
         int power = rs.getInt("power");
 
-        return new UserSkill(null,new User(userId),new Skill(skillId,skillName),power);
+        return new UserSkill(userSkillId,new User(userId),new Skill(skillId,skillName),power);
     }
 
     @Override
@@ -24,6 +25,7 @@ public class UserSkillDaoImpl implements UserSkillDaoInter {
         try {
             Connection c = ConnMySql.getInstance().getConnection();
             PreparedStatement stmt = c.prepareStatement("select " +
+                    "    us.id as userSkillId," +
                     "    u.*," +
                     "    us.skill_id," +
                     "    s.name as skill_name," +
@@ -46,5 +48,47 @@ public class UserSkillDaoImpl implements UserSkillDaoInter {
             System.out.println("Select error UserSkill: " + e);
         }
         return result;
+    }
+    @Override
+    public boolean updateUserSkill(UserSkill userSkill){
+        try{
+            Connection conn = ConnMySql.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("update user_skill set power = ?, user_id = ?, skill_id = ? where id = ?");
+            stmt.setInt(1, userSkill.getPower());
+            stmt.setInt(2, userSkill.getUser().getId());
+            stmt.setInt(3, userSkill.getSkill().getId());
+            stmt.setInt(4, userSkill.getId());
+            return stmt.execute();
+        }catch(Exception e){
+            System.out.println("Update UserSkill Error: " + e);
+            return false;
+        }
+    }
+    @Override
+    public boolean addUserSkill(UserSkill userSkill){
+        try{
+            Connection c = ConnMySql.getInstance().getConnection();
+            PreparedStatement stmt = c.prepareStatement("insert into user_skill(user_id,skill_id,power) values(?,?,?);" );
+            stmt.setInt(1, userSkill.getUser().getId());
+            stmt.setInt(2, userSkill.getSkill().getId());
+            stmt.setInt(3, userSkill.getPower());
+            return stmt.execute();
+        }catch(Exception e){
+            System.out.println("Insert UserSkill Error: " + e);
+            return false;
+        }
+    }
+    @Override
+    public boolean deleteUserSkill(int id){
+        try{
+            Connection c = ConnMySql.getInstance().getConnection();
+            
+            PreparedStatement stmt = c.prepareStatement("delete from user_skill where id = ?");
+            stmt.setInt(1, id);
+            return stmt.execute();
+        }catch(Exception e){
+            System.out.println("Delete UserSkill Error: " + e);
+            return false;
+        }
     }
 }

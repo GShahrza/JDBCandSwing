@@ -90,14 +90,17 @@ public class UserDaoImpl implements UserDaoInter{
 
         try {
             Connection c = ConnMySql.getInstance().getConnection();
-            PreparedStatement stmt = c.prepareStatement("update user  set name = ?,surname = ?,email = ?,phone = ?,profile_description = ?,address = ? where id = ?");
+            PreparedStatement stmt = c.prepareStatement("update user  set name = ?,surname = ?,email = ?,phone = ?,profile_description = ?,address = ?, birthdate = ?, birthplace_id = ?, nationality_id = ? where id = ?");
             stmt.setString(1, u.getName());
             stmt.setString(2, u.getSurname());
             stmt.setString(3, u.getEmail());
             stmt.setString(4, u.getPhone());
             stmt.setString(5, u.getProfileDescription());
             stmt.setString(6, u.getAddress());
-            stmt.setInt(7,u.getId());
+            stmt.setDate(7, u.getBirthDate());
+            stmt.setInt(8, u.getBirthPlace().getId());
+            stmt.setInt(9, u.getNationality().getId());
+            stmt.setInt(10,u.getId());
             return stmt.execute();
         }catch (Exception e){
             System.out.println("Update Error: " + e);
@@ -109,13 +112,14 @@ public class UserDaoImpl implements UserDaoInter{
     public boolean addUser(User u) {
         try {
             Connection c = ConnMySql.getInstance().getConnection();
-            PreparedStatement stmt = c.prepareStatement("insert into user(name,surname,email,phone,profile_description,address) values (?,?,?,?,?,?) ");
+            PreparedStatement stmt = c.prepareStatement("insert into user(name,surname,email,phone,profile_description,address,birthdate) values (?,?,?,?,?,?,?) ");
             stmt.setString(1, u.getName());
             stmt.setString(2, u.getSurname());
             stmt.setString(3, u.getEmail());
             stmt.setString(4, u.getPhone());
             stmt.setString(5,u.getProfileDescription());
             stmt.setString(6,u.getAddress());
+            stmt.setDate(7, u.getBirthDate());
             return stmt.execute();
         }catch (Exception e){
             System.out.println("Insert Error: " + e);

@@ -14,4 +14,6 @@ public class UserSkill {
     private User user;
     private Skill skill;
     private int power;
+    
+    
 }

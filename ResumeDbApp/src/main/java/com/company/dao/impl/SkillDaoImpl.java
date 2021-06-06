@@ -5,6 +5,7 @@ import com.company.db.ConnMySql;
 import com.company.entity.Skill;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -34,4 +35,24 @@ public class SkillDaoImpl implements SkillDaoInter {
         }
         return result;
     }
+
+    @Override
+    public boolean addSkill(Skill skill) {
+        try{
+            Connection conn = ConnMySql.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("insert into skill(name) values(?)",Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, skill.getName());
+            boolean b = stmt.execute();
+            
+            ResultSet generatedKeys = stmt.getGeneratedKeys();
+              if(generatedKeys.next()){
+                    skill.setId(generatedKeys.getInt(1));
+                }  
+            return b;
+        }catch(Exception e){
+            System.out.println("Insert Skill Error: " + e);
+            return false;
+        }
+    }
+    
 }
